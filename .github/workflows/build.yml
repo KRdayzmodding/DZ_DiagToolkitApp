@@ -26,7 +26,10 @@ jobs:
         os: [windows-latest, ubuntu-latest]
         include:
           - os: windows-latest
-            additional_cmake_flags: '-A x64 -DCMAKE_GENERATOR_TOOLSET=v142'
+            # Используем ClangCL toolset вместо MSVC v142
+            additional_cmake_flags: '-A x64 -T ClangCL'
+          - os: ubuntu-latest
+            additional_cmake_flags: ''
 
     steps:
       - name: Fetch sources
@@ -55,26 +58,39 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install \
-          clang \
-          pkg-config \
-          libglew-dev \
-          zlib1g-dev \
-          libssl-dev \
-          libcrypt-dev \
-          libcurl4-openssl-dev \
-          libgtk-4-dev \
-          libadwaita-1-dev \
-          libdbus-1-dev \
-          libfontconfig-dev \
-          ninja-build \
-          libpulse-dev \
+            clang \
+            lld \
+            pkg-config \
+            libglew-dev \
+            zlib1g-dev \
+            libssl-dev \
+            libcrypt-dev \
+            libcurl4-openssl-dev \
+            libgtk-4-dev \
+            libadwaita-1-dev \
+            libdbus-1-dev \
+            libfontconfig-dev \
+            ninja-build \
+            libpulse-dev
 
       - name: Install macos dependencies
-        if: runner.os == 'macos-latest'
+        if: runner.os == 'macOS'
         run: brew install ninja
 
-      - name: Configure CMake
-        run: cmake -G "${{ matrix.os=='windows-latest' && 'Visual Studio 17 2022' || 'Ninja' }}" -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=RelWithDebInfo ${{matrix.additional_cmake_flags}} -DAUI_INSTALL_RUNTIME_DEPENDENCIES=TRUE
+      - name: Configure CMake (Windows)
+        if: runner.os == 'Windows'
+        run: cmake -G "Visual Studio 17 2022" -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=RelWithDebInfo ${{matrix.additional_cmake_flags}} -DAUI_INSTALL_RUNTIME_DEPENDENCIES=TRUE
+
+      - name: Configure CMake (Linux)
+        if: runner.os == 'Linux'
+        env:
+          CC: clang
+          CXX: clang++
+        run: cmake -G Ninja -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DAUI_INSTALL_RUNTIME_DEPENDENCIES=TRUE
+
+      - name: Configure CMake (macOS)
+        if: runner.os == 'macOS'
+        run: cmake -G Ninja -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DAUI_INSTALL_RUNTIME_DEPENDENCIES=TRUE
 
       - name: Build Project
         run: cmake --build ${{github.workspace}}/build --config RelWithDebInfo
@@ -88,7 +104,7 @@ jobs:
         run: ${{github.workspace}}/build/bin/RelWithDebInfo/Tests.exe
 
       - name: Run Tests (Linux and macOS)
-        if: runner.os == 'Linux'
+        if: runner.os != 'Windows'
         working-directory: ${{github.workspace}}/build/bin
         run: ${{github.workspace}}/build/bin/Tests
 
@@ -146,7 +162,7 @@ jobs:
           VERSION=$(grep -Po '[0-9\.]+(?= # CI_PROJECT_VERSION)' CMakeLists.txt)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "VERSION = $VERSION"
-          
+
       # Remove old release drafts
       - name: Remove Old Release Drafts
         env:
@@ -154,7 +170,7 @@ jobs:
         run: |
           gh api repos/{owner}/{repo}/releases \
             --jq '.[] | select(.draft == true) | .id' \
-            | xargs -I '{}' gh api -X DELETE repos/{owner}/{repo}/releases/{} 
+            | xargs -I '{}' gh api -X DELETE repos/{owner}/{repo}/releases/{}
 
       - name: Download artifacts
         uses: actions/download-artifact@v4

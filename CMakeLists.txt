@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(example_app
         VERSION 0.0.12 # CI_PROJECT_VERSION
-    )
+)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -14,7 +14,8 @@ option(BUILD_SHARED_LIBS "Build shared libs" OFF)
 option(AUIB_FORCE_PRECOMPILED "AUI.Boot: force precompiled dependencies" OFF)
 option(AUIB_NO_PRECOMPILED "AUI.Boot: disable precompiled dependencies" OFF)
 
-set(AUI_VERSION develop)
+# set(AUI_VERSION develop)
+set(AUI_VERSION 12554c2b58bf4b44fcc134e6402e361b9c0a0b41)
 
 # Use AUI.Boot
 file(
@@ -51,9 +52,10 @@ aui_app(TARGET ${PROJECT_NAME}
 
 # Force C++23 for this target (must be after all aui_* functions)
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    CXX_STANDARD 23
-    CXX_STANDARD_REQUIRED ON
+        CXX_STANDARD 23
+        CXX_STANDARD_REQUIRED ON
 )
 
 # Add C++23 compile option for clang-cl (using -Xclang to pass to clang frontend)
-target_compile_options(${PROJECT_NAME} PRIVATE -Xclang -std=c++23)
+target_compile_options(${PROJECT_NAME} PRIVATE 
+-Xclang -std=c++23 -Wno-deprecated-this-capture)
