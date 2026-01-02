@@ -24,12 +24,6 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-latest, ubuntu-latest]
-        include:
-          - os: windows-latest
-            # Используем ClangCL toolset вместо MSVC v142
-            additional_cmake_flags: '-A x64 -T ClangCL'
-          - os: ubuntu-latest
-            additional_cmake_flags: ''
 
     steps:
       - name: Fetch sources
@@ -51,7 +45,8 @@ jobs:
 
       - name: Install Windows dependencies
         if: runner.os == 'Windows'
-        run: choco install innosetup
+        run: |
+          choco install innosetup ninja
 
       - name: Install Linux dependencies
         if: runner.os == 'Linux'
@@ -73,24 +68,45 @@ jobs:
             ninja-build \
             libpulse-dev
 
-      - name: Install macos dependencies
+      - name: Install macOS dependencies
         if: runner.os == 'macOS'
         run: brew install ninja
 
+      # Windows: Setup MSVC environment and use Ninja with clang-cl
+      - name: Setup MSVC Dev Environment
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
       - name: Configure CMake (Windows)
         if: runner.os == 'Windows'
-        run: cmake -G "Visual Studio 17 2022" -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=RelWithDebInfo ${{matrix.additional_cmake_flags}} -DAUI_INSTALL_RUNTIME_DEPENDENCIES=TRUE
+        run: |
+          cmake -G Ninja -B ${{github.workspace}}/build `
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo `
+            -DCMAKE_C_COMPILER=clang-cl `
+            -DCMAKE_CXX_COMPILER=clang-cl `
+            -DCMAKE_LINKER=lld-link `
+            -DAUI_INSTALL_RUNTIME_DEPENDENCIES=TRUE
 
       - name: Configure CMake (Linux)
         if: runner.os == 'Linux'
         env:
           CC: clang
           CXX: clang++
-        run: cmake -G Ninja -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DAUI_INSTALL_RUNTIME_DEPENDENCIES=TRUE
+        run: |
+          cmake -G Ninja -B ${{github.workspace}}/build \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_C_COMPILER=clang \
+            -DCMAKE_CXX_COMPILER=clang++ \
+            -DAUI_INSTALL_RUNTIME_DEPENDENCIES=TRUE
 
       - name: Configure CMake (macOS)
         if: runner.os == 'macOS'
-        run: cmake -G Ninja -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DAUI_INSTALL_RUNTIME_DEPENDENCIES=TRUE
+        run: |
+          cmake -G Ninja -B ${{github.workspace}}/build \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DAUI_INSTALL_RUNTIME_DEPENDENCIES=TRUE
 
       - name: Build Project
         run: cmake --build ${{github.workspace}}/build --config RelWithDebInfo
@@ -100,8 +116,8 @@ jobs:
 
       - name: Run Tests (Windows)
         if: runner.os == 'Windows'
-        working-directory: ${{github.workspace}}/build/bin/RelWithDebInfo/
-        run: ${{github.workspace}}/build/bin/RelWithDebInfo/Tests.exe
+        working-directory: ${{github.workspace}}/build/bin
+        run: ${{github.workspace}}/build/bin/Tests.exe
 
       - name: Run Tests (Linux and macOS)
         if: runner.os != 'Windows'
