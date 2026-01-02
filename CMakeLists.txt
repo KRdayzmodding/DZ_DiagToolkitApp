@@ -4,11 +4,17 @@ project(example_app
         VERSION 0.0.12 # CI_PROJECT_VERSION
     )
 
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 option(BUILD_SHARED_LIBS "Build shared libs" OFF)
 option(AUIB_FORCE_PRECOMPILED "AUI.Boot: force precompiled dependencies" OFF)
 option(AUIB_NO_PRECOMPILED "AUI.Boot: disable precompiled dependencies" OFF)
 
-set(AUI_VERSION v8.0.0-rc.13)
+set(AUI_VERSION develop)
 
 # Use AUI.Boot
 file(
@@ -42,3 +48,12 @@ aui_app(TARGET ${PROJECT_NAME}
         VENDOR "AUI Project"
         ICON "assets/img/icon.svg"
 )
+
+# Force C++23 for this target (must be after all aui_* functions)
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    CXX_STANDARD 23
+    CXX_STANDARD_REQUIRED ON
+)
+
+# Add C++23 compile option for clang-cl (using -Xclang to pass to clang frontend)
+target_compile_options(${PROJECT_NAME} PRIVATE -Xclang -std=c++23)

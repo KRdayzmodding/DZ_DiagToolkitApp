@@ -1,0 +1,140 @@
+CompileFlags:
+  CompilationDatabase: "E:/source/AUI_App/out/build/x64-debug/compile_commands.json"
+  Add: 
+    # Стандарт C++
+    - "-std=c++23"
+    - "-xc++"
+    
+    # Основные пути к AUI библиотеке (без external: префикса)
+    - "-IC:/Users/_/.aui/prefix/aui/a060f6438f7ca81ee431a9850f190ae2/aui.core/include"
+    - "-IC:/Users/_/.aui/prefix/aui/a060f6438f7ca81ee431a9850f190ae2/aui.views/include"
+    - "-IC:/Users/_/.aui/prefix/aui/a060f6438f7ca81ee431a9850f190ae2/aui.updater/include"
+    - "-IC:/Users/_/.aui/prefix/aui/a060f6438f7ca81ee431a9850f190ae2/aui.image/include"
+    - "-IC:/Users/_/.aui/prefix/aui/a060f6438f7ca81ee431a9850f190ae2/aui.xml/include"
+    - "-IC:/Users/_/.aui/prefix/aui/a060f6438f7ca81ee431a9850f190ae2/aui.crypt/include"
+    - "-IC:/Users/_/.aui/prefix/aui/a060f6438f7ca81ee431a9850f190ae2/aui.curl/include"
+    - "-IC:/Users/_/.aui/prefix/aui/a060f6438f7ca81ee431a9850f190ae2/aui.json/include"
+    
+    # Пути к зависимостям
+    - "-IC:/Users/_/.aui/prefix/aui/a060f6438f7ca81ee431a9850f190ae2/deps/fmt/7233bb0f9337d0ac0733ac7a8741aaad/include"
+    - "-IC:/Users/_/.aui/prefix/aui/a060f6438f7ca81ee431a9850f190ae2/deps/range-v3/502ff737bedb66d42305eea531ddd3a2/include"
+    - "-IC:/Users/_/.aui/prefix/aui/a060f6438f7ca81ee431a9850f190ae2/deps/zlib/7621ff4eab28976561f55cdcb262ea30/include"
+    - "-IC:/Users/_/.aui/prefix/aui/a060f6438f7ca81ee431a9850f190ae2/deps/curl/4c889f711b263ded86abaae0ec9e6192/include"
+    - "-IC:/Users/_/.aui/prefix/aui/a060f6438f7ca81ee431a9850f190ae2/deps/openssl/6d065e7e1d1707ea0846186c7cd4f03a/include"
+    - "-IC:/Users/_/.aui/prefix/aui/a060f6438f7ca81ee431a9850f190ae2/deps/freetype/48d43b149696b70a59f5fa2257c31b83/include/freetype2"
+    - "-IC:/Users/_/.aui/prefix/aui/a060f6438f7ca81ee431a9850f190ae2/deps/glew/aa7934c697c505a79103194cd8fa4970/include"
+    - "-IC:/Users/_/.aui/prefix/aui/a060f6438f7ca81ee431a9850f190ae2/deps/lunasvg/fdf66fd22479942ac670a121c60891d6/include"
+    - "-IC:/Users/_/.aui/prefix/aui/a060f6438f7ca81ee431a9850f190ae2/deps/webp/5f36e273e624e6dfa4d3ada7c7982dcf/include"
+    - "-IC:/Users/_/.aui/prefix/aui/a060f6438f7ca81ee431a9850f190ae2/deps/webp/5f36e273e624e6dfa4d3ada7c7982dcf/include/webp"
+    - "-IC:/Users/_/.aui/prefix/aui/a060f6438f7ca81ee431a9850f190ae2/deps/gtest/6442b050eec5f29d2db45b41179436ff/include"
+    - "-IC:/Users/_/.aui/repo/ctre/as/v3.10.0/ctre/include"
+    - "-IC:/Users/_/.aui/repo/reproc/as/v14.2.5/reproc/reproc/include"
+    - "-IC:/Users/_/.aui/repo/reproc/as/v14.2.5/reproc/reproc++/include"
+    - "-IC:/Users/_/.aui/repo/glaze/as/v5.5.5/glaze/include"
+    - "-IC:/Users/_/.aui/repo/taglib/as/v2.1.1/taglib"
+    - "-IC:/Users/_/.aui/repo/taglib/as/v2.1.1/taglib/taglib"
+    - "-IC:/Users/_/.aui/repo/taglib/as/v2.1.1/taglib/taglib/toolkit"
+
+    # Исходные файлы проекта
+    - "-IE:/source/AUI_App/src"
+    - "-IE:/source/AUI_App/tests"
+    
+    # Критически важные дефайны для AUI
+    - "-DAPI_AUI_CORE=AUI_IMPORT"
+    - "-DAPI_AUI_CRYPT=AUI_IMPORT"
+    - "-DAPI_AUI_CURL=AUI_IMPORT"
+    - "-DAPI_AUI_IMAGE=AUI_IMPORT"
+    - "-DAPI_AUI_JSON=AUI_IMPORT"
+    - "-DAPI_AUI_UPDATER=AUI_IMPORT"
+    - "-DAPI_AUI_VIEWS=AUI_IMPORT"
+    - "-DAPI_AUI_XML=AUI_IMPORT"
+    
+    # Дефайны платформы и архитектуры
+    - "-DAUI_PLATFORM_WIN=1"
+    - "-DAUI_ARCH_X86_64=1"
+    - "-DAUI_COMPILER_MSVC=1"
+    - "-DAUI_DEBUG=1"
+    - "-DAUI_STATIC=1"
+    
+    # Системные дефайны Windows
+    - "-DWIN32"
+    - "-D_WINDOWS"
+    - "-DNOMINMAX=1"
+    
+    # Дефайны для библиотек
+    - "-DCURL_STATICLIB"
+    - "-DFMT_HEADER_ONLY=1"
+    - "-DGLEW_STATIC"
+    - "-DGLM_FORCE_INLINE=1"
+    - "-DLUNASVG_STATIC_DEFINE"
+    
+    # Дополнительные дефайны проекта
+    - "-DAUI_CMAKE_PROJECT_VERSION=0.0.10"
+    - "-DAUI_MODULE_NAME=example_app"
+    - "-DAUI_CATCH_UNHANDLED=1"
+    - "-DAUI_ENABLE_DEATH_TESTS=1"
+
+  Remove:
+    # Убираем MSVC-специфичные флаги, которые clangd не понимает
+    - "-external:*"
+    - "/nologo"
+    - "/TP"
+    - "/GR"
+    - "/EHsc"
+    - "/Zi"
+    - "/Ob0"
+    - "/Od"
+    - "/RTC1"
+    - "-MDd"
+    - "/MP"
+    - "/utf-8"
+    - "/permissive-"
+    - "/Fo*"
+    - "/Fd*"
+    - "/FS"
+
+Index:
+  Background: Build
+  
+Diagnostics:
+  # Отключаем все проверки неиспользуемых включений
+  UnusedIncludes: None
+  
+  # Отключаем конкретные диагностики
+  Suppress: 
+    - "unused-includes"
+    - "ext_using_undefined_std"
+    - "fatal_too_many_errors"
+    - "exceptions_disabled"
+    - "unknown_typename"
+
+  ClangTidy:
+    Add: 
+      - modernize*
+      - performance*
+      - readability*
+      - bugprone*
+    Remove:
+      - modernize-use-trailing-return-type
+      - readability-identifier-length
+      - readability-magic-numbers
+      - readability-identifier-naming
+      - readability-uppercase-literal-suffix
+      - modernize-use-nodiscard
+      - readability-implicit-bool-conversion
+      - readability-function-cognitive-complexity
+      - bugprone-easily-swappable-parameters
+      - bugprone-branch-clone
+    CheckOptions:
+      readability-identifier-naming.ClassCase: CamelCase
+      readability-identifier-naming.MethodCase: camelBack
+      readability-identifier-naming.VariableCase: camelBack
+      readability-identifier-naming.ConstantCase: UPPER_CASE
+
+InlayHints:
+  Enabled: Yes
+  ParameterNames: Yes
+  DeducedTypes: Yes
+  
+Completion:
+  AllScopes: Yes

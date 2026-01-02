@@ -8,4 +8,9 @@
     "clangd.arguments": [
         "--compile-commands-dir=build/"
     ],
+    "[cpp]": {
+        "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd"
+    },
+    "C_Cpp.errorSquiggles": "disabled",
+
 }
